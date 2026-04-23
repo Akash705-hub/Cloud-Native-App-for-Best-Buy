@@ -59,6 +59,12 @@ jobs:
             exit 1
           fi
 
+          if [[ "$ASERVICE_BUS_CONNECTION_STRING" != Endpoint=sb://* ]] || [[ "$ASERVICE_BUS_CONNECTION_STRING" != *"SharedAccessKeyName="* ]] || [[ "$ASERVICE_BUS_CONNECTION_STRING" != *"SharedAccessKey="* ]]; then
+            echo "ASERVICE_BUS_CONNECTION_STRING does not look like a valid Service Bus connection string."
+            echo "Expected format starts with: Endpoint=sb://<namespace>.servicebus.windows.net/;..."
+            exit 1
+          fi
+
           kubectl create secret generic best-buy-secrets \
             -n "$K8S_NAMESPACE" \
             --from-literal=ASERVICE_BUS_CONNECTION_STRING="$ASERVICE_BUS_CONNECTION_STRING" \
