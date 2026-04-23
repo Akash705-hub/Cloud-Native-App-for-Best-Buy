@@ -1,0 +1,55 @@
+name: Deploy to Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - deployment_files/**
+      - .github/workflows/deploy.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Apply Kubernetes Manifest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.30.0
+
+      - name: Configure kubeconfig
+        shell: bash
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        run: |
+          if [ -z "$KUBE_CONFIG_DATA" ]; then
+            echo "KUBE_CONFIG_DATA secret is not set"
+            exit 1
+          fi
+
+          mkdir -p "$HOME/.kube"
+          echo "$KUBE_CONFIG_DATA" | base64 -d > "$HOME/.kube/config"
+          chmod 600 "$HOME/.kube/config"
+
+      - name: Validate cluster connection
+        run: kubectl cluster-info
+
+      - name: Deploy application
+        run: kubectl apply -f deployment_files/best-buy.yaml
+
+      - name: Verify rollouts
+        run: |
+          kubectl rollout status deployment/order-service --timeout=180s
+          kubectl rollout status deployment/makeline-service --timeout=180s
+          kubectl rollout status deployment/shipping-service --timeout=180s
+          kubectl rollout status deployment/product-service --timeout=180s
+          kubectl rollout status deployment/store-front --timeout=180s
+          kubectl rollout status deployment/store-admin --timeout=180s
