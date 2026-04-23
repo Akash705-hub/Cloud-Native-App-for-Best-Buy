@@ -20,9 +20,16 @@ It will deploy automatically when:
 3. A kubeconfig file for that cluster.
 4. The Kubernetes secret `best-buy-secrets` created in the target namespace (default namespace if not specified).
 
-## Configure GitHub Secret
+## Configure GitHub Secrets
 
-Create one repository secret named `KUBE_CONFIG_DATA` with your kubeconfig encoded in base64.
+Create these repository secrets:
+
+- `KUBE_CONFIG_DATA`
+- `ASERVICE_BUS_CONNECTION_STRING`
+- `MONGO_URI`
+- `BLOB_CONNECTION_STRING`
+
+Use `KUBE_CONFIG_DATA` as your kubeconfig encoded in base64.
 
 ### PowerShell (Windows)
 
@@ -37,20 +44,7 @@ Copy the output and add it in GitHub:
 - Name: `KUBE_CONFIG_DATA`
 - Value: (paste base64 output)
 
-## Ensure Application Secrets Exist in Cluster
-
-Your manifest expects this Kubernetes secret:
-
-- `best-buy-secrets`
-
-Example (replace values):
-
-```bash
-kubectl create secret generic best-buy-secrets \
-	--from-literal=ASERVICE_BUS_CONNECTION_STRING="..." \
-	--from-literal=MONGO_URI="..." \
-	--from-literal=BLOB_CONNECTION_STRING="..."
-```
+The workflow will create or update Kubernetes secret `best-buy-secrets` automatically from the three application secrets.
 
 ## Run Deployment
 
@@ -60,13 +54,14 @@ kubectl create secret generic best-buy-secrets \
 The workflow executes:
 
 1. Authenticate using `KUBE_CONFIG_DATA`
-2. Apply [deployment_files/best-buy.yaml](deployment_files/best-buy.yaml)
-3. Wait for rollout success of all deployments
+2. Create/update Kubernetes secret `best-buy-secrets`
+3. Apply [deployment_files/best-buy.yaml](deployment_files/best-buy.yaml)
+4. Wait for rollout success of all deployments
 
 ## Troubleshooting
 
 - If deployment fails at kubeconfig step, verify `KUBE_CONFIG_DATA` exists and is valid base64.
-- If pods crash with missing env values, recreate/update `best-buy-secrets`.
+- If workflow fails before deploy, verify GitHub Secrets are set: `ASERVICE_BUS_CONNECTION_STRING`, `MONGO_URI`, `BLOB_CONNECTION_STRING`.
 - If rollout times out, inspect pods and events:
 
 ```bash

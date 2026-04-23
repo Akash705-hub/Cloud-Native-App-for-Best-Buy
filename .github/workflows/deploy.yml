@@ -16,6 +16,8 @@ jobs:
   deploy:
     name: Apply Kubernetes Manifest
     runs-on: ubuntu-latest
+    env:
+      K8S_NAMESPACE: default
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,14 +44,36 @@ jobs:
       - name: Validate cluster connection
         run: kubectl cluster-info
 
+      - name: Create or update application secrets
+        shell: bash
+        env:
+          ASERVICE_BUS_CONNECTION_STRING: ${{ secrets.ASERVICE_BUS_CONNECTION_STRING }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
+          BLOB_CONNECTION_STRING: ${{ secrets.BLOB_CONNECTION_STRING }}
+        run: |
+          kubectl get namespace "$K8S_NAMESPACE" >/dev/null
+
+          if [ -z "$ASERVICE_BUS_CONNECTION_STRING" ] || [ -z "$MONGO_URI" ] || [ -z "$BLOB_CONNECTION_STRING" ]; then
+            echo "Required GitHub secrets are missing."
+            echo "Expected: ASERVICE_BUS_CONNECTION_STRING, MONGO_URI, BLOB_CONNECTION_STRING"
+            exit 1
+          fi
+
+          kubectl create secret generic best-buy-secrets \
+            -n "$K8S_NAMESPACE" \
+            --from-literal=ASERVICE_BUS_CONNECTION_STRING="$ASERVICE_BUS_CONNECTION_STRING" \
+            --from-literal=MONGO_URI="$MONGO_URI" \
+            --from-literal=BLOB_CONNECTION_STRING="$BLOB_CONNECTION_STRING" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Deploy application
-        run: kubectl apply -f deployment_files/best-buy.yaml
+        run: kubectl apply -n "$K8S_NAMESPACE" -f deployment_files/best-buy.yaml
 
       - name: Verify rollouts
         run: |
-          kubectl rollout status deployment/order-service --timeout=180s
-          kubectl rollout status deployment/makeline-service --timeout=180s
-          kubectl rollout status deployment/shipping-service --timeout=180s
-          kubectl rollout status deployment/product-service --timeout=180s
-          kubectl rollout status deployment/store-front --timeout=180s
-          kubectl rollout status deployment/store-admin --timeout=180s
+          kubectl rollout status deployment/order-service -n "$K8S_NAMESPACE" --timeout=300s
+          kubectl rollout status deployment/makeline-service -n "$K8S_NAMESPACE" --timeout=300s
+          kubectl rollout status deployment/shipping-service -n "$K8S_NAMESPACE" --timeout=300s
+          kubectl rollout status deployment/product-service -n "$K8S_NAMESPACE" --timeout=300s
+          kubectl rollout status deployment/store-front -n "$K8S_NAMESPACE" --timeout=300s
+          kubectl rollout status deployment/store-admin -n "$K8S_NAMESPACE" --timeout=300s
