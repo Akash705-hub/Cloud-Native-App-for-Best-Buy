@@ -68,6 +68,9 @@ jobs:
           kubectl create secret generic best-buy-secrets \
             -n "$K8S_NAMESPACE" \
             --from-literal=ASERVICE_BUS_CONNECTION_STRING="$ASERVICE_BUS_CONNECTION_STRING" \
+            --from-literal=ASB_CONNECTION_STRING="$ASERVICE_BUS_CONNECTION_STRING" \
+            --from-literal=SERVICE_BUS_CONNECTION_STRING="$ASERVICE_BUS_CONNECTION_STRING" \
+            --from-literal=AZURE_SERVICEBUS_CONNECTION_STRING="$ASERVICE_BUS_CONNECTION_STRING" \
             --from-literal=MONGO_URI="$MONGO_URI" \
             --from-literal=BLOB_CONNECTION_STRING="$BLOB_CONNECTION_STRING" \
             --dry-run=client -o yaml | kubectl apply -f -

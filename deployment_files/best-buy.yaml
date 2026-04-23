@@ -35,6 +35,21 @@ spec:
                 secretKeyRef:
                   name: best-buy-secrets
                   key: ASERVICE_BUS_CONNECTION_STRING
+            - name: ASB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: ASB_CONNECTION_STRING
+            - name: SERVICE_BUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: SERVICE_BUS_CONNECTION_STRING
+            - name: AZURE_SERVICEBUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: AZURE_SERVICEBUS_CONNECTION_STRING
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
@@ -123,6 +138,21 @@ spec:
                 secretKeyRef:
                   name: best-buy-secrets
                   key: ASERVICE_BUS_CONNECTION_STRING
+            - name: ASB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: ASB_CONNECTION_STRING
+            - name: SERVICE_BUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: SERVICE_BUS_CONNECTION_STRING
+            - name: AZURE_SERVICEBUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: AZURE_SERVICEBUS_CONNECTION_STRING
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
@@ -208,6 +238,21 @@ spec:
                 secretKeyRef:
                   name: best-buy-secrets
                   key: ASERVICE_BUS_CONNECTION_STRING
+            - name: ASB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: ASB_CONNECTION_STRING
+            - name: SERVICE_BUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: SERVICE_BUS_CONNECTION_STRING
+            - name: AZURE_SERVICEBUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: best-buy-secrets
+                  key: AZURE_SERVICEBUS_CONNECTION_STRING
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
