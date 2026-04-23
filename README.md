@@ -8,6 +8,51 @@ This repository deploys the Best Buy microservices stack to Kubernetes using Git
 - **Course:** CST8916 - Winter 2026
 
 
+## Architecure
+
+```mermaid
+flowchart TB
+  Dev[Developer] --> GH[GitHub Repository]
+  GH --> GHA[GitHub Actions Deploy Workflow]
+  GHA -->|KUBE_CONFIG_DATA| AKS[(AKS Cluster)]
+  GHA -->|Creates/Updates best-buy-secrets| K8sSecret[(Kubernetes Secret best-buy-secrets)]
+  GHA -->|kubectl apply best-buy.yaml| AKS
+
+  subgraph NS[Namespace: default]
+    direction LR
+    SF[store-front :8080 LoadBalancer]
+    SA[store-admin :8081 LoadBalancer]
+    OS[order-service :3000]
+    MS[makeline-service :3001]
+    PS[product-service :3002]
+    SS[shipping-service :3003]
+  end
+
+  User1[Customer Browser] --> SF
+  User2[Admin Browser] --> SA
+
+  SF --> OS
+  SF --> PS
+  SA --> PS
+  SA --> MS
+
+  OS --> Mongo[(MongoDB)]
+  MS --> Mongo
+  PS --> Mongo
+  SS --> Mongo
+
+  OS --> SB[(Azure Service Bus)]
+  MS --> SB
+  SS --> SB
+
+  PS --> Blob[(Azure Blob Storage)]
+
+  K8sSecret -. env vars .-> OS
+  K8sSecret -. env vars .-> MS
+  K8sSecret -. env vars .-> PS
+  K8sSecret -. env vars .-> SS
+```
+
 ## Deploy with GitHub Actions
 
 The workflow file is:
