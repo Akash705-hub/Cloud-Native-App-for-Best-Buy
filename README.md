@@ -2,6 +2,12 @@
 
 This repository deploys the Best Buy microservices stack to Kubernetes using GitHub Actions.
 
+## Student Information
+- **Name:** Akash Patel
+- **Student ID:** 041269598
+- **Course:** CST8916 - Winter 2026
+
+
 ## Deploy with GitHub Actions
 
 The workflow file is:
@@ -69,3 +75,30 @@ kubectl get pods
 kubectl describe pod <pod-name>
 kubectl get events --sort-by=.metadata.creationTimestamp
 ```
+
+
+
+## Links
+
+### Repository links
+
+| Service          | Link                                               |
+| ---------------- | -------------------------------------------------- |
+| store-front      | https://github.com/Akash705-hub/store-front-bb      |
+| store-admin      | https://github.com/Akash705-hub/store-admin-bb      |
+| product-service  | https://github.com/Akash705-hub/product-service-bb  |
+| order-service    | https://github.com/Akash705-hub/order-service-bb    |
+| makeline-service | https://github.com/Akash705-hub/makeline-service-bb |
+| shipping-service | https://github.com/Akash705-hub/shipping-service-bb |
+
+### Docker Hub links
+
+| Service          | Link                                                                          |
+| ---------------- | ----------------------------------------------------------------------------- |
+| store-front      | https://hub.docker.com/repository/docker/akash0898/store-front-bb/general     |
+| store-admin      | https://hub.docker.com/repository/docker/akash0898/store-admin-bb/general      |
+| product-service  | https://hub.docker.com/repository/docker/akash0898/product-service-bb  |
+| order-service    | https://hub.docker.com/repository/docker/akash0898/order-service-bb/general    |
+| makeline-service | https://hub.docker.com/repository/docker/akash0898/makeline-service-bb |
+| shipping-service | https://hub.docker.com/repository/docker/akash0898/shipping-service-bb |
+
