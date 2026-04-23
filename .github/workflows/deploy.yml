@@ -77,3 +77,29 @@ jobs:
           kubectl rollout status deployment/product-service -n "$K8S_NAMESPACE" --timeout=300s
           kubectl rollout status deployment/store-front -n "$K8S_NAMESPACE" --timeout=300s
           kubectl rollout status deployment/store-admin -n "$K8S_NAMESPACE" --timeout=300s
+
+      - name: Dump diagnostics on failure
+        if: failure()
+        shell: bash
+        run: |
+          echo "=== Deployments ==="
+          kubectl get deployments -n "$K8S_NAMESPACE" -o wide || true
+
+          echo "=== Pods ==="
+          kubectl get pods -n "$K8S_NAMESPACE" -o wide || true
+
+          echo "=== Recent Events ==="
+          kubectl get events -n "$K8S_NAMESPACE" --sort-by=.metadata.creationTimestamp | tail -n 100 || true
+
+          echo "=== Makeline Deployment Describe ==="
+          kubectl describe deployment makeline-service -n "$K8S_NAMESPACE" || true
+
+          echo "=== Makeline Pods Describe and Logs ==="
+          for p in $(kubectl get pod -n "$K8S_NAMESPACE" -l app=makeline-service -o jsonpath='{.items[*].metadata.name}'); do
+            echo "--- Describe $p ---"
+            kubectl describe pod "$p" -n "$K8S_NAMESPACE" || true
+            echo "--- Logs $p ---"
+            kubectl logs "$p" -n "$K8S_NAMESPACE" --tail=200 || true
+            echo "--- Previous Logs $p ---"
+            kubectl logs "$p" -n "$K8S_NAMESPACE" --previous --tail=200 || true
+          done
